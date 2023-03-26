@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "@react-native-firebase/app": "^17.4.0",
+    "@sayem314/react-native-keep-awake": "^1.1.0",
     "react": "18.2.0",
     "react-native": "0.71.4",
     "react-native-geolocation-service": "^5.3.1",

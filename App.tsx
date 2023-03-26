@@ -6,7 +6,7 @@
  * @flow strict-local
  */
 import React from 'react';
-import GPSLogger from './src/GPSLogger/_GPSLogger';
+import GPSLogger from './src/GPSLogger/GPSLogger';
 
 const App = () => {
   return <GPSLogger />;

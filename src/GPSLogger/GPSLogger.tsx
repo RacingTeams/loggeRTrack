@@ -16,7 +16,10 @@ import {
   requestLocationPermission,
 } from './helpers';
 import {writeFirestoreDB, writeFirestoreDBRealtime} from '../firebase/firebase';
-import {activateKeepAwake, deactivateKeepAwake} from 'expo-keep-awake';
+import {
+  activateKeepAwake,
+  deactivateKeepAwake,
+} from '@sayem314/react-native-keep-awake';
 
 const GEOLOCATION_OPTIONS: GeoWatchOptions = {
   enableHighAccuracy: true,

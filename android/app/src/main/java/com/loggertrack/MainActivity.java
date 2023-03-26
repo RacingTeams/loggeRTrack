@@ -1,4 +1,4 @@
-package com.loggertrack;
+package com.racingteamsapp.loggeRTrack;
 
 import com.facebook.react.ReactActivity;
 import com.facebook.react.ReactActivityDelegate;
