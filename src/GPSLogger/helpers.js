@@ -1,4 +1,4 @@
-import {PermissionsAndroid} from 'react-native/types';
+import {PermissionsAndroid} from 'react-native';
 
 export const getLocation = () => {
   if (navigator.geolocation) {
