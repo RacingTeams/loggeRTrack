@@ -1,6 +1,6 @@
-import {doc, getFirestore, setDoc} from 'firebase/firestore';
-import {initializeApp} from 'firebase/app';
-import {getDatabase, ref, set} from 'firebase/database';
+import firestore from '@react-native-firebase/firestore';
+// import database from '@react-native-firebase/database';
+import {initializeApp} from '@react-native-firebase/app';
 
 // $FIREBASE_TOKEN= "1//09ouc-LuBvYvxCgYIARAAGAkSNwF-L9IrZ7z5XxOPqEydiT14Dt5J0yBSR2BNPgsBDGLk1q2xEk49lKcofC22nfAIrGOtWaHwIwk"
 
@@ -16,12 +16,12 @@ const firebaseConfig = {
     'https://racing-teams-default-rtdb.europe-west1.firebasedatabase.app/',
 };
 const firebaseApp = initializeApp(firebaseConfig);
-const firestoreDB = getFirestore();
-const rtDB = getDatabase();
+const firestoreDB = firestore();
+// const rtDB = database();
 
-const writeRtDB = (teamId, userId, value) => {
-  set(ref(rtDB, `${teamId}/${userId}/`), value);
-};
+// const writeRtDB = (teamId, userId, value) => {
+//   rtDB.ref(`${teamId}/${userId}/`).set(value);
+// };
 
 const writeFirestoreDBRealtime = async (
   teamId,
@@ -38,40 +38,13 @@ const writeFirestoreDBRealtime = async (
     heading: value.coords.heading,
     speed: value.coords.speed,
   };
-  const docRef = doc(
-    firestoreDB,
-    teamId,
-    userId,
-    'mobileGPSRealtimeAcquisition',
-    acquiringUID,
+  const docRef = firestoreDB.doc(
+    `${teamId}/${userId}/mobileGPSRealtimeAcquisition/${acquiringUID}`,
   );
   try {
-    await setDoc(docRef, {timestamp: value.timestamp, coords}, {merge: true});
+    await docRef.set({timestamp: value.timestamp, coords}, {merge: true});
   } catch (error) {
     console.log('🚀 ~ file: firebase.js:31 ~ writeFirestoreDB ~ error:', error);
-  }
-};
-const writeFirestoreDB = async (teamId, userId, acquiringUID, value) => {
-  const coords = {
-    latitude: value.coords.latitude,
-    longitude: value.coords.longitude,
-    accuracy: value.coords.accuracy,
-    altitude: value.coords.altitude,
-    altitudeAccuracy: value.coords.altitudeAccuracy,
-    heading: value.coords.heading,
-    speed: value.coords.speed,
-  };
-  const docRef = doc(
-    firestoreDB,
-    teamId,
-    userId,
-    'mobileGPSAcquisition',
-    acquiringUID,
-  );
-  try {
-    await setDoc(docRef, {[value.timestamp]: coords}, {merge: true});
-  } catch (error) {
-    console.log('🚀 ~ file: firebase.js:78 ~ writeFirestoreDB ~ error:', error);
   }
 };
 
@@ -79,7 +52,6 @@ export {
   firebaseConfig,
   firestoreDB as db,
   firebaseApp,
-  writeRtDB,
-  writeFirestoreDB,
+  // writeRtDB,
   writeFirestoreDBRealtime,
 };

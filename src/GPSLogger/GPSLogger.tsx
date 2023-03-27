@@ -15,11 +15,8 @@ import {
   printInfo,
   requestLocationPermission,
 } from './helpers';
-import {writeFirestoreDB, writeFirestoreDBRealtime} from '../firebase/firebase';
-import {
-  activateKeepAwake,
-  deactivateKeepAwake,
-} from '@sayem314/react-native-keep-awake';
+import {writeFirestoreDBRealtime, writeRtDB} from '../firebase/firebase';
+
 
 const GEOLOCATION_OPTIONS: GeoWatchOptions = {
   enableHighAccuracy: true,
@@ -54,12 +51,14 @@ const App = () => {
         name ? name + '-' + acquiringUID : acquiringUID,
         geolocation,
       );
-      writeFirestoreDB(
-        'testDevTeam',
-        'testDevUser',
-        name ? name + '-' + acquiringUID : acquiringUID,
-        geolocation,
-      );
+//       writeRtDB(
+//         'testDevTeam',
+//         'testDevUser',
+// // name ? name + '-' + acquiringUID : acquiringUID,
+
+//         geolocation,
+//       );
+
     }
   }, [geolocation, acquiringUID, name]);
 
@@ -75,7 +74,8 @@ const App = () => {
       clearInterval(geolocationWatcherId);
       setGeolocationWatcherId(0);
 
-      deactivateKeepAwake();
+// deactivateKeepAwake();
+
     }
 
     return () => {
@@ -96,7 +96,8 @@ const App = () => {
     stopObserving();
     setGeolocationWatcherId(setInterval(getLocation, 250));
 
-    activateKeepAwake();
+// activateKeepAwake();
+
   };
 
   const startWatchingLocation = async () => {
@@ -115,7 +116,8 @@ const App = () => {
         GEOLOCATION_OPTIONS,
       ),
     );
-    activateKeepAwake();
+// activateKeepAwake();
+
   };
 
   const stopWatchingLocation = () => {
@@ -124,7 +126,8 @@ const App = () => {
     stopObserving();
     clearInterval(geolocationWatcherId);
     setGeolocationWatcherId(0);
-    deactivateKeepAwake();
+// deactivateKeepAwake();
+
   };
 
   const getLocation = () => {
