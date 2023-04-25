@@ -1,22 +1,20 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, {useState, useEffect, useCallback} from 'react';
-import {View, Text, TextInput, TouchableOpacity} from 'react-native';
+import React, {useState, useEffect} from 'react';
+import {View} from 'react-native';
 import {
   GeoPosition,
   getCurrentPosition,
   stopObserving,
   watchPosition,
   GeoWatchOptions,
-  clearWatch,
 } from 'react-native-geolocation-service';
-import {
-  onCurrentPosition,
-  onPositionError,
-  printInfo,
-  requestLocationPermission,
-} from './helpers';
-import {writeFirestoreDBRealtime, writeRtDB} from '../firebase/firebase';
-
+import {onCurrentPosition, onPositionError, printInfo} from './helpers';
+import {writeFirestoreDBRealtime} from '../firebase/firebase';
+// import {
+//   activateKeepAwake,
+//   deactivateKeepAwake,
+// } from '@sayem314/react-native-keep-awake';
+import {TextInput, Button, Text, Stack} from '@react-native-material/core';
 
 const GEOLOCATION_OPTIONS: GeoWatchOptions = {
   enableHighAccuracy: true,
@@ -28,6 +26,14 @@ const GEOLOCATION_OPTIONS: GeoWatchOptions = {
   useSignificantChanges: false,
   forceLocationManager: false,
   showsBackgroundLocationIndicator: true,
+};
+
+const theme = {
+  primary: '#feda3b',
+  secondary: '#000',
+  primaryText: '#000',
+  secondaryText: '#fff',
+  inputBG: 'rgba(255, 255, 255, 0.15)',
 };
 
 const App = () => {
@@ -51,14 +57,13 @@ const App = () => {
         name ? name + '-' + acquiringUID : acquiringUID,
         geolocation,
       );
-//       writeRtDB(
-//         'testDevTeam',
-//         'testDevUser',
-// // name ? name + '-' + acquiringUID : acquiringUID,
+      //       writeRtDB(
+      //         'testDevTeam',
+      //         'testDevUser',
+      // // name ? name + '-' + acquiringUID : acquiringUID,
 
-//         geolocation,
-//       );
-
+      //         geolocation,
+      //       );
     }
   }, [geolocation, acquiringUID, name]);
 
@@ -66,42 +71,7 @@ const App = () => {
     geolocationWatcherId ?? setAcquiringUID(new Date().getTime().toString());
   }, [geolocationWatcherId]);
 
-  const stopAcquiringLocation = useCallback(() => {
-    if (geolocationWatcherId) {
-      printInfo('Stopped Acquiring Location', setInfo);
-      setIsAcquiring('');
-
-      clearInterval(geolocationWatcherId);
-      setGeolocationWatcherId(0);
-
-// deactivateKeepAwake();
-
-    }
-
-    return () => {
-      if (geolocationWatcherId) {
-        clearWatch(geolocationWatcherId);
-      }
-    };
-  }, [geolocationWatcherId]);
-
-  useEffect(() => {
-    error && stopAcquiringLocation();
-  }, [error, stopAcquiringLocation]);
-
-  const startAcquiringLocation = async () => {
-    printInfo('Started Acquiring Location', setInfo);
-    setIsAcquiring('polling');
-
-    stopObserving();
-    setGeolocationWatcherId(setInterval(getLocation, 250));
-
-// activateKeepAwake();
-
-  };
-
   const startWatchingLocation = async () => {
-    stopAcquiringLocation();
     setIsAcquiring('watching');
     printInfo('Started Watching Location', setInfo);
     getCurrentPosition(
@@ -116,8 +86,7 @@ const App = () => {
         GEOLOCATION_OPTIONS,
       ),
     );
-// activateKeepAwake();
-
+    // activateKeepAwake();
   };
 
   const stopWatchingLocation = () => {
@@ -126,30 +95,7 @@ const App = () => {
     stopObserving();
     clearInterval(geolocationWatcherId);
     setGeolocationWatcherId(0);
-// deactivateKeepAwake();
-
-  };
-
-  const getLocation = () => {
-    const result = requestLocationPermission();
-    result.then(res => {
-      // console.log('res is:', res);
-      if (res) {
-        getCurrentPosition(
-          position => {
-            // console.log(position);
-            setGeolocation(position);
-          },
-          err => {
-            // See err code charts below.
-            console.log(err.code, err.message);
-            setGeolocation(null);
-          },
-          {enableHighAccuracy: true, timeout: 15000, maximumAge: 10000},
-        );
-      }
-    });
-    // console.log(geolocation);
+    // deactivateKeepAwake();
   };
 
   return (
@@ -160,125 +106,83 @@ const App = () => {
         justifyContent: 'center',
         alignItems: 'center',
         height: '100%',
+        backgroundColor: theme.secondary,
       }}>
-      <View
+      <Stack
         style={{
+          height: '20 %',
           display: 'flex',
-          flexDirection: 'column',
           justifyContent: 'center',
-          alignItems: 'center',
-          width: '100%',
-          height: '100%',
-          backgroundColor: 'white',
         }}>
-        <View
-          style={{
-            padding: 10,
-            margin: 20,
-          }}>
-          <Text style={{color: 'blue', fontSize: 24}}>GPS Logger</Text>
-        </View>
-        <View
-          style={{
-            display: 'flex',
-            flexDirection: 'column',
-            justifyContent: 'center',
-            alignItems: 'center',
-            marginVertical: 20,
-          }}>
-          <TextInput
-            onChangeText={value => setName(value)}
-            id="session-name"
-            placeholder="Session name"
-          />
-        </View>
-        <Text style={{color: 'blue', fontSize: 16}}>
+        <Text color={theme.primary} variant="h4">
+          GPS Data Logger
+        </Text>
+      </Stack>
+
+      <Stack
+        m={30}
+        style={{
+          backgroundColor: theme.inputBG,
+          padding: 30,
+          borderRadius: 18,
+          width: '70 %',
+        }}>
+        <Text style={{color: theme.secondaryText, fontSize: 16}}>
           Lat: {geolocation ? geolocation.coords.latitude : 0}
         </Text>
-        <Text style={{color: 'blue', fontSize: 16}}>
+        <Text style={{color: theme.secondaryText, fontSize: 16}}>
           Long: {geolocation ? geolocation.coords.longitude : 0}
         </Text>
-        <Text style={{color: 'blue', fontSize: 16}}>
+        <Text style={{color: theme.secondaryText, fontSize: 16}}>
           Acc: {geolocation ? geolocation.coords.accuracy : 0}
         </Text>
-        <Text style={{color: 'blue', fontSize: 16}}>
+        <Text style={{color: theme.secondaryText, fontSize: 16}}>
           Head: {geolocation ? geolocation.coords.heading : 0} °North
         </Text>
-        <Text style={{color: 'blue', fontSize: 16}}>
+        <Text style={{color: theme.secondaryText, fontSize: 16}}>
           Speed: {geolocation ? geolocation.coords.speed : 0} m/s
         </Text>
-        <Text style={{color: 'blue', fontSize: 16}}>
-          Timestamp: {timeStamp || 0} s
+        <Text style={{color: theme.secondaryText, fontSize: 16}}>
+          Time: {timeStamp || 0} s
         </Text>
-        <View style={{flexDirection: 'row', marginTop: 20}}>
-          {isAcquiring === '' && (
-            <TouchableOpacity
-              style={{
-                backgroundColor: 'green',
-                padding: 10,
-                width: 200,
-                height: 60,
-                justifyContent: 'center',
-                alignItems: 'center',
-              }}
-              onPress={startAcquiringLocation}>
-              <Text style={{color: 'white', fontSize: 16}}>
-                {'Start acquiring location'}
-              </Text>
-            </TouchableOpacity>
-          )}
-          {isAcquiring === 'polling' && (
-            <TouchableOpacity
-              style={{
-                backgroundColor: 'red',
-                padding: 10,
-                width: 200,
-                height: 60,
-                justifyContent: 'center',
-                alignItems: 'center',
-              }}
-              onPress={stopAcquiringLocation}>
-              <Text style={{color: 'white', fontSize: 16}}>
-                {'Stop acquiring location'}
-              </Text>
-            </TouchableOpacity>
-          )}
-        </View>
-        <View style={{flexDirection: 'row', marginVertical: 20}}>
-          {isAcquiring === '' && (
-            <TouchableOpacity
-              disabled={!name}
-              style={{
-                backgroundColor: 'blue',
-                padding: 20,
-                width: 200,
-                height: 60,
-                justifyContent: 'center',
-                alignItems: 'center',
-              }}
-              onPress={startWatchingLocation}>
-              <Text style={{color: 'white', fontSize: 16}}>
-                {'Start watching location'}
-              </Text>
-            </TouchableOpacity>
-          )}
-          {isAcquiring === 'watching' && (
-            <TouchableOpacity
-              style={{
-                backgroundColor: 'red',
-                padding: 20,
-                width: 200,
-                height: 60,
-                justifyContent: 'center',
-                alignItems: 'center',
-              }}
-              onPress={stopWatchingLocation}>
-              <Text style={{color: 'white', fontSize: 16}}>
-                {'Stop watching location'}
-              </Text>
-            </TouchableOpacity>
-          )}
-        </View>
+      </Stack>
+
+      <Stack style={{width: '70%'}} m={4}>
+        <TextInput
+          id="session-name"
+          // label="Session name"
+          onChange={e => setName(e.nativeEvent.text)}
+          placeholder="Session name *"
+          color={theme.primary}
+          variant="outlined"
+          inputContainerStyle={{backgroundColor: theme.inputBG, height: 60}}
+          inputStyle={{color: theme.secondaryText, height: 80}}
+          helperText="The name is required for the session"
+        />
+      </Stack>
+
+      <View style={{flexDirection: 'row', marginVertical: 20}}>
+        <Button
+          title={
+            isAcquiring === 'watching' ? 'Stop acquiring' : 'Acquire GPS Data'
+          }
+          disabled={!name}
+          titleStyle={{color: theme.primaryText}}
+          style={{
+            backgroundColor: theme.primary,
+            minWidth: '70%',
+            padding: 20,
+            width: 200,
+            height: 60,
+            justifyContent: 'center',
+            alignItems: 'center',
+          }}
+          onPress={
+            isAcquiring === 'watching'
+              ? stopWatchingLocation
+              : startWatchingLocation
+          }
+        />
       </View>
     </View>
   );
